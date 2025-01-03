@@ -117,7 +117,8 @@ class TradingChart(QWidget):
             # OI RSI
             mpf.make_addplot(ind_df['oi_rsi'], color='purple', width=1),
             # Long Ratio
-            mpf.make_addplot(ind_df['long_ratio'], color='green', width=1),
+
+            mpf.make_addplot(ind_df['long_ratio'], color='green', width=1, ylabel='Long Ratio %', ylim=(60, 90)),
         ]
 
         # 거래 마커 추가
