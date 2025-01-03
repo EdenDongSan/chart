@@ -93,31 +93,47 @@ class TradingChart(QWidget):
         return df, ind_df
 
     def update_chart(self):
+        """차트 업데이트"""
+        # 데이터 가져오기
         candles, indicators, trades = self.db.get_recent_data()
-        df, ind_df = self.prepare_data(candles, indicators)
+        df, ind_df = self.prepare_data(candles, indicators)  # 데이터 전처리
+
+        # 최신 데이터로 필터링 (마지막 200개 캔들만 사용)
         df = df.tail(200)
         ind_df = ind_df.tail(200)
 
-        apds = [
-            mpf.make_addplot(df['ema200'], color='blue', width=1)
-        ]
+        # 캔들 차트 및 거래량 차트를 위한 Figure와 Axes 생성
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'height_ratios': [3, 1]})
 
-        fig, ax1 = plt.subplots(figsize=(12, 8))
-        mpf.plot(df, type='candle', ax=ax1, volume=True)
+        # 첫 번째 패널: 캔들 차트
+        mpf.plot(
+            df,
+            type='candle',
+            ax=ax1,
+            style=mpf.make_mpf_style(base_mpf_style='charles', gridstyle=':', gridcolor='gray')
+        )
 
-        ax2 = ax1.twinx()
-        ax2.plot(ind_df.index, ind_df['oi_rsi'], color='purple', label='OI RSI')
-        ax2.set_ylabel('OI RSI', color='purple')
-        ax2.tick_params(axis='y', colors='purple')
+        # 두 번째 패널: 볼륨 표시
+        ax2.bar(df.index, df['volume'], color='gray', width=0.001)
+        ax2.set_ylabel('Volume')
 
+        # 첫 번째 오른쪽 Y축: OI RSI
         ax3 = ax1.twinx()
-        ax3.spines['right'].set_position(('axes', 1.1))
-        ax3.plot(ind_df.index, ind_df['long_ratio'], color='green', label='Long Ratio %')
-        ax3.set_ylabel('Long Ratio %', color='green')
-        ax3.tick_params(axis='y', colors='green')
+        ax3.plot(ind_df.index, ind_df['oi_rsi'], color='purple', label='OI RSI')
+        ax3.set_ylabel('OI RSI', color='purple')
+        ax3.tick_params(axis='y', colors='purple')
 
+        # 두 번째 오른쪽 Y축: Long Ratio
+        ax4 = ax1.twinx()
+        ax4.spines['right'].set_position(('axes', 1.1))
+        ax4.plot(ind_df.index, ind_df['long_ratio'], color='green', label='Long Ratio %')
+        ax4.set_ylabel('Long Ratio %', color='green')
+        ax4.tick_params(axis='y', colors='green')
+
+        # 캔버스 업데이트
         self.canvas.figure = fig
         self.canvas.draw()
+
 
 
 class MainWindow(QMainWindow):
