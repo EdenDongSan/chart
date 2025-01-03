@@ -99,14 +99,7 @@ class TradingChart(QWidget):
         ind_df = ind_df.tail(200)
 
         apds = [
-
-            # EMA200
-            mpf.make_addplot(df['ema200'], color='blue', width=1),
-            # OI RSI
-            mpf.make_addplot(ind_df['oi_rsi'], color='purple', width=1),
-            # Long Ratio
-
-            mpf.make_addplot(ind_df['long_ratio'], color='green', width=1, ylabel='Long Ratio %', ylim=(60, 90)),
+            mpf.make_addplot(df['ema200'], color='blue', width=1)
         ]
 
         fig, ax1 = plt.subplots(figsize=(12, 8))
